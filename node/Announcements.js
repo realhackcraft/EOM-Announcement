@@ -1,18 +1,13 @@
 class Announcements {
   constructor(key) {
-    this.savedKey = localStorage.getItem('key');
+    const savedKey = localStorage.getItem('key');
+    const address = savedKey ? savedKey : key;
 
-    this.key = this.savedKey ? this.savedKey : key;
-
-    this.sheetDB = require('sheetdb-node');
-    this.client = this.sheetDB({ address: this.key });
+    const sheetDB = require('sheetdb-node');
+    this.client = sheetDB({ address: address });
 
     this.announcementRegex = /^\w{3},\s\w{3}\s\d{1,2}$/;
     this.weeklyRegex = /^Weekly\s(on\s)?(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/;
-
-    this.validAnnouncementsStart = [];
-    this.validAnnouncementsEnd = [];
-    this.validAnnouncements = [];
   }
 
   update() {
@@ -25,11 +20,15 @@ class Announcements {
   }
 
   #processData(data) {
+    const validAnnouncementsStart = [];
+    const validAnnouncementsEnd = [];
+    const validAnnouncements = [];
+
     let response;
     for (let i = 0; i < data.length; i++) {
       response = data[i];
       if (this.announcementRegex.test(response['Start Date (First day for announcement)'])) {
-        let date = new Date(response['Start Date (First day for announcement)']);
+        const date = new Date(response['Start Date (First day for announcement)']);
 
         if (date.getMonth() >= 6) {
           date.setFullYear(new Date().getFullYear() - 1);
@@ -37,7 +36,7 @@ class Announcements {
           date.setFullYear(new Date().getFullYear());
         }
 
-        this.validAnnouncementsStart.push({
+        validAnnouncementsStart.push({
           i,
           date,
           announcement: response['Announcement (As you wish to have it read by members of Student Council)'],
@@ -45,7 +44,7 @@ class Announcements {
       } else if (this.weeklyRegex.test(response['Start Date (First day for announcement)']) && response['Start Date' +
       ' (First day for announcement)'].includes(new Date().toLocaleString('en-us', { weekday: 'long' }))) {
 
-        this.validAnnouncements.push(response['Announcement (As you wish to have it read by members of Student' +
+        validAnnouncements.push(response['Announcement (As you wish to have it read by members of Student' +
         ' Council)']);
       } else {
         continue;
@@ -60,9 +59,9 @@ class Announcements {
           date.setFullYear(new Date().getFullYear());
         }
 
-        this.validAnnouncementsEnd.push({ i, date });
-      } else if (this.validAnnouncementsStart.find(begin => begin.i === i)) {
-        this.validAnnouncementsEnd.push({ i, date: this.validAnnouncementsStart.find(begin => begin.i === i).date });
+        validAnnouncementsEnd.push({ i, date });
+      } else if (validAnnouncementsStart.find(begin => begin.i === i)) {
+        validAnnouncementsEnd.push({ i, date: validAnnouncementsStart.find(begin => begin.i === i).date });
       }
     }
 
@@ -76,14 +75,7 @@ class Announcements {
       }
     });
 
-    document.getElementById('announcement-wrapper').innerHTML = ''; // remove everything before adding new announcements
-
-    for (let announcement of validAnnouncements) {
-      const announcementDiv = document.createElement('div');
-      announcementDiv.classList.add('announcement');
-      announcementDiv.innerHTML = announcement;
-      document.getElementById('announcement-wrapper').appendChild(announcementDiv);
-    }
+    this.#updateHTML();
 
     localStorage.setItem('announcements', JSON.stringify(validAnnouncements));
     localStorage.setItem('lastUpdated', Date.now().toString());
@@ -91,16 +83,21 @@ class Announcements {
 
   checkCache() {
     if (Date.now() - localStorage.getItem('lastUpdated') < 1000 * 60 * 60 * 24) {
-      document.getElementById('announcement-wrapper').innerHTML = ''; // remove everything before adding new announcements
-      const announcements = JSON.parse(localStorage.getItem('announcements'));
-      for (let announcement of announcements) {
-        const announcementDiv = document.createElement('div');
-        announcementDiv.classList.add('announcement');
-        announcementDiv.innerHTML = announcement;
-        document.getElementById('announcement-wrapper').appendChild(announcementDiv);
-      }
+      this.#updateHTML();
     } else {
       this.update();
+    }
+  }
+
+  #updateHTML() {
+    document.getElementById('announcement-wrapper').innerHTML = '';
+
+    const announcements = JSON.parse(localStorage.getItem('announcements'));
+    for (let announcement of announcements) {
+      const announcementDiv = document.createElement('div');
+      announcementDiv.classList.add('announcement');
+      announcementDiv.innerHTML = announcement;
+      document.getElementById('announcement-wrapper').appendChild(announcementDiv);
     }
   }
 }
