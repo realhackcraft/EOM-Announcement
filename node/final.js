@@ -114,3 +114,12 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000); // check for updates every 5 minutes
 localStorage.setItem('key', key);
+
+
+
+// password reset button handler
+document.getElementById('password-reset').addEventListener('click', () => {
+  localStorage.removeItem('key');
+  location.reload();
+})
+
