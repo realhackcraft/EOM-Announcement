@@ -1,4 +1,4 @@
-const savedKey= localStorage.getItem('key');
+const savedKey = localStorage.getItem('key');
 
 const key = savedKey ? savedKey : prompt('Enter the super secret password:');
 
@@ -21,7 +21,7 @@ function decrypt(encryptedMessage) {
 const decryptedMessage = decrypt(encryptedMessage);
 
 const sheetDB = require('sheetdb-node');
-const client = sheetDB({ address: decryptedMessage })
+const client = sheetDB({ address: decryptedMessage });
 
 function update() {
   let data;
@@ -34,8 +34,8 @@ function update() {
 
   client.read().then((sheet) => {
     data = JSON.parse(sheet);
-    processData(data)
-  })
+    processData(data);
+  });
 
   function processData(data) {
     let response;
@@ -50,7 +50,11 @@ function update() {
           date.setFullYear(new Date().getFullYear());
         }
 
-        validAnnouncementsStart.push({ i, date, announcement: response['Announcement (As you wish to have it read by members of Student Council)'] });
+        validAnnouncementsStart.push({
+          i,
+          date,
+          announcement: response['Announcement (As you wish to have it read by members of Student Council)'],
+        });
       } else {
         continue;
       }
@@ -83,7 +87,7 @@ function update() {
     for (let announcement of validAnnouncements) {
       const announcementDiv = document.createElement('div');
       announcementDiv.classList.add('announcement');
-      announcementDiv.innerHTML = announcement
+      announcementDiv.innerHTML = announcement;
       document.getElementById('announcement-wrapper').appendChild(announcementDiv);
     }
 
@@ -98,28 +102,31 @@ if (Date.now() - localStorage.getItem('lastUpdated') < 1000 * 60 * 60 * 24) {
   for (let announcement of announcements) {
     const announcementDiv = document.createElement('div');
     announcementDiv.classList.add('announcement');
-    announcementDiv.innerHTML = announcement
+    announcementDiv.innerHTML = announcement;
     document.getElementById('announcement-wrapper').appendChild(announcementDiv);
   }
 } else {
-update();
+  update();
 }
 
 setInterval(() => {
   if (Date.now() - localStorage.getItem('lastUpdated') > 1000 * 60 * 60 * 24) {
     update();
-    console.log('Updated announcements')
+    console.log('Updated announcements');
   } else {
-    console.log('Announcements are up-to-date')
+    console.log('Announcements are up-to-date');
   }
 }, 5 * 60 * 1000); // check for updates every 5 minutes
 localStorage.setItem('key', key);
-
 
 
 // password reset button handler
 document.getElementById('password-reset').addEventListener('click', () => {
   localStorage.removeItem('key');
   location.reload();
-})
+});
 
+document.getElementById('force-update').addEventListener('click', () => {
+  update();
+  location.reload();
+});
