@@ -2,26 +2,8 @@ const savedKey = localStorage.getItem('key');
 
 const key = savedKey ? savedKey : prompt('Enter the super secret password:');
 
-
-const encryptedMessage = '585ffd5f21d78cc146686bb5ae463b30d04d08b283a358e1125d2b2c7c262fe6';
-
-// Decrypt the message using AES256 CBC mode
-function decrypt(encryptedMessage) {
-  const ciphertextBuffer = forge.util.createBuffer();
-  ciphertextBuffer.putBytes(forge.util.hexToBytes(encryptedMessage));
-  const iv = ciphertextBuffer.getBytes(16);
-  const cipherText = ciphertextBuffer.getBytes();
-  const decipher = forge.cipher.createDecipher('AES-CBC', key);
-  decipher.start({ iv: iv });
-  decipher.update(forge.util.createBuffer(cipherText));
-  decipher.finish();
-  return decipher.output.toString();
-}
-
-const decryptedMessage = decrypt(encryptedMessage);
-
 const sheetDB = require('sheetdb-node');
-const client = sheetDB({ address: decryptedMessage });
+const client = sheetDB({ address: key });
 
 function update() {
   let data;
