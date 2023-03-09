@@ -127,6 +127,10 @@ document.getElementById('password-reset').addEventListener('click', () => {
 });
 
 document.getElementById('force-update').addEventListener('click', () => {
-  update();
-  location.reload();
+  if (confirm('Are you sure you want to force an update?')) {
+    update();
+    alert('Updated announcements!');
+  } else {
+    alert('Update cancelled.');
+  }
 });
