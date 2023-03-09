@@ -26,11 +26,14 @@ const client = sheetDB({ address: decryptedMessage });
 function update() {
   let data;
 
-  let regex = /^\w{3},\s\w{3}\s\d{1,2}$/;
+  let announcementRegex = /^\w{3},\s\w{3}\s\d{1,2}$/;
+  // format: "Weekly on Monday, Tuesday, Wednesday, Thursday, Friday"
+  let weeklyRegex = /^Weekly\s(on\s)?(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/;
 
   let validAnnouncementsStart = [];
   let validAnnouncementsEnd = [];
   let validAnnouncements = [];
+  let weeklyAnnouncements = [];
 
   client.read().then((sheet) => {
     data = JSON.parse(sheet);
@@ -41,7 +44,7 @@ function update() {
     let response;
     for (let i = 0; i < data.length; i++) {
       response = data[i];
-      if (regex.test(response['Start Date (First day for announcement)'])) {
+      if (announcementRegex.test(response['Start Date (First day for announcement)'])) {
         let date = new Date(response['Start Date (First day for announcement)']);
 
         if (date.getMonth() >= 6) {
@@ -55,11 +58,14 @@ function update() {
           date,
           announcement: response['Announcement (As you wish to have it read by members of Student Council)'],
         });
+      } else if (weeklyRegex.test(response['Start Date (First day for announcement)']) && response['Start Date (First day for announcement)'].includes(new Date().toLocaleString('en-us', { weekday: 'long' }))) {
+
+        validAnnouncements.push(response['Announcement (As you wish to have it read by members of Student Council)']);
       } else {
         continue;
       }
 
-      if (regex.test(response['End Date (Final day for announcement)'])) {
+      if (announcementRegex.test(response['End Date (Final day for announcement)'])) {
         const date = new Date(response['End Date (Final day for announcement)']);
 
         if (date.getMonth() >= 6) {
@@ -69,7 +75,7 @@ function update() {
         }
 
         validAnnouncementsEnd.push({ i, date });
-      } else {
+      } else if (validAnnouncementsStart.find(begin => begin.i === i)) {
         validAnnouncementsEnd.push({ i, date: validAnnouncementsStart.find(begin => begin.i === i).date });
       }
     }

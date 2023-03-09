@@ -7,7 +7,7 @@
   },
   "scripts": {
     "bundle": "browserify node/final.js -p tinyify | terser -cm --comments false > bundle.min.js  ",
-    "test": "node -p tinyify node/fetcher.js && node node/processor.js"
+    "test": "browserify node/final.js -o bundle.min.js"
   },
   "dependencies": {
     "sheetdb-node": "^0.0.12"
