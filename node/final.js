@@ -33,7 +33,6 @@ function update() {
   let validAnnouncementsStart = [];
   let validAnnouncementsEnd = [];
   let validAnnouncements = [];
-  let weeklyAnnouncements = [];
 
   client.read().then((sheet) => {
     data = JSON.parse(sheet);
@@ -90,6 +89,8 @@ function update() {
       }
     });
 
+    document.getElementById('announcement-wrapper').innerHTML = ''; // remove everything before adding new announcements
+
     for (let announcement of validAnnouncements) {
       const announcementDiv = document.createElement('div');
       announcementDiv.classList.add('announcement');
@@ -104,6 +105,7 @@ function update() {
 
 //  if updated less than 24 hours ago, use the cached announcements
 if (Date.now() - localStorage.getItem('lastUpdated') < 1000 * 60 * 60 * 24) {
+  document.getElementById('announcement-wrapper').innerHTML = ''; // remove everything before adding new announcements
   const announcements = JSON.parse(localStorage.getItem('announcements'));
   for (let announcement of announcements) {
     const announcementDiv = document.createElement('div');
