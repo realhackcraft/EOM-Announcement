@@ -38,6 +38,10 @@ h1 {
   margin: 0.2em;
 }
 
+.button:hover {
+  cursor: pointer;
+}
+
 @media (prefers-color-scheme: light) {
   body {
     background-color: #eeeeee;
