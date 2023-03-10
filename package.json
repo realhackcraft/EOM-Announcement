@@ -6,8 +6,8 @@
     "minify": "latest"
   },
   "scripts": {
-    "bundle": "browserify node/final.js -p tinyify | minify --js > Announcements.min.js",
-    "test": "browserify node/final.js -o bundle.min.js"
+    "bundle": "browserify node/Announcements.js -p tinyify | minify --js > Announcements.min.js",
+    "test": "browserify node/Announcements.js -o Announcements.min.js"
   },
   "dependencies": {
     "sheetdb-node": "^0.0.12"
