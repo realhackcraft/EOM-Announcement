@@ -3,7 +3,8 @@
     "browserify": "^17.0.0",
     "stylelint": "^15.2.0",
     "stylelint-config-recommended": "^10.0.1",
-    "tinyify": "^2.0.0"
+    "tinyify": "^2.0.0",
+    "terser": "^5.16.6"
   },
   "scripts": {
     "bundle": "browserify node/final.js -p tinyify | terser -cm --comments false > bundle.min.js  ",
