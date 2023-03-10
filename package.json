@@ -3,11 +3,10 @@
     "browserify": "^17.0.0",
     "stylelint": "^15.2.0",
     "stylelint-config-recommended": "^10.0.1",
-    "tinyify": "^2.0.0",
-    "terser": "^5.16.6"
+    "minify": "latest"
   },
   "scripts": {
-    "bundle": "browserify node/final.js -p tinyify | terser -cm --comments false > bundle.min.js  ",
+    "bundle": "browserify node/final.js -p tinyify | minify --js > Announcements.min.js",
     "test": "browserify node/final.js -o bundle.min.js"
   },
   "dependencies": {
